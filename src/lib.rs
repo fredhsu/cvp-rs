@@ -37,45 +37,45 @@ pub mod cloudvision {
     #[derive(Debug, Serialize, Deserialize)]
     pub struct Device {
         #[serde(rename="modelName")]
-        model_name:            String,
+        model_name:            Option<String>,
         #[serde(rename="internalVersion")]
-        internal_version:      String,
+        internal_version:      Option<String>,
         #[serde(rename="systemMacAddress")]
-        system_mac_address:     String,
+        system_mac_address:     Option<String>,
         #[serde(rename="memTotal")]
-        mem_total:             u64,
+        mem_total:             Option<u64>,
         #[serde(rename="memFree")]
-        mem_free:              u64,
+        mem_free:              Option<u64>,
         #[serde(rename="bootupTimestamp")]
-        bootup_timestamp:      f64,
-        version:              String,
-        architecture:         String,
+        bootup_timestamp:      Option<f64>,
+        version:              Option<String>,
+        architecture:         Option<String>,
         #[serde(rename="internalBuild")]
-        internal_build:        String,
+        internal_build:        Option<String>,
         #[serde(rename="hardwareRevision")]
-        hardware_revision:     String,
+        hardware_revision:     Option<String>,
         #[serde(rename="domainName")]
-        domain_name:          String,
-        hostname:            String,
-        fqdn:                String,
+        domain_name:          Option<String>,
+        hostname:            Option<String>,
+        fqdn:                Option<String>,
         #[serde(rename="serialNumber")]
-        serial_number:        String,
+        serial_number:        Option<String>,
         #[serde(rename="danzEnabled")]
-        danz_enabled:         bool,
+        danz_enabled:         Option<bool>,
         #[serde(rename="mlagEnabled")]
-        mlag_enabled: bool,
+        mlag_enabled: Option<bool>,
         #[serde(rename="parentContainerKey")]
-        parent_container_key:  String,
-        status:              String,
+        parent_container_key:  Option<String>,
+        status:              Option<String>,
         #[serde(rename="complianceCode")]
-        compliance_code:      String,
+        compliance_code:      Option<String>,
         #[serde(rename="complianceIndiciation")]
-        compliance_indication:  String,
+        compliance_indication:  Option<String>,
         #[serde(rename="ztpMode")]
-        ztp_mode:              bool,
-        unauthorized:         bool,
+        ztp_mode:              Option<bool>,
+        unauthorized:         Option<bool>,
         #[serde(rename="ipAddress")]
-        ip_address:            String,
+        ip_address:            Option<String>,
     }
 
    
@@ -148,6 +148,25 @@ mod tests {
             }
         }
         assert!(true);
-
+    }
+    #[test]
+    fn test_get_inventory() {
+        let user = cloudvision::User::new("cvpadmin", "arista");
+        let client = cloudvision::Client::new("https://10.90.224.175/cvpservice", user);
+        let auth_client = match client.authenticate() {
+                Ok(c) => c,
+                Err(error) => {
+                    panic!("{}", error)
+                },
+            };
+        let inventory = auth_client.get_inventory(false);
+        let device_list = match inventory {
+            Ok(result) => result,
+            Err(error) => {
+                println!("{:?}", error);
+                panic!(error)
+            }
+        };
+        assert_eq!(device_list.len(), 31);
     }
 }
